@@ -33,7 +33,6 @@ define([
                 const urlType = $(this).attr('data-url-type');
                 const stagingUrl = apiProject['url:staging'] + $(this).attr('data-url-ext');
                 const prodUrl = apiProject['url:prod'] + $(this).attr('data-url-ext');
-                console.log($(this))
     
                 $(this).attr('data-url-type', urlType === 'prod' ? 'staging' : 'prod');
                 $(this).text(`Switch to ${urlType}`)
