@@ -1,31 +1,46 @@
 
 define([
   'jquery',
-], function($) {
+  './api_project.js',
+], function($, apiProject) {
 
-  var initDynamic = function() {
-      // Button send
-      $(".sample-request-send").off("click");
-      $(".sample-request-send").on("click", function(e) {
-          e.preventDefault();
-          var $root = $(this).parents("article");
-          var group = $root.data("group");
-          var name = $root.data("name");
-          var version = $root.data("version");
-          sendSampleRequest(group, name, version, $(this).data("sample-request-type"));
-      });
+    var initDynamic = function() {
+        // Button send
+        $(".sample-request-send").off("click");
+        $(".sample-request-send").on("click", function(e) {
+            e.preventDefault();
+            var $root = $(this).parents("article");
+            var group = $root.data("group");
+            var name = $root.data("name");
+            var version = $root.data("version");
+            sendSampleRequest(group, name, version, $(this).data("sample-request-type"));
+        });
 
-      // Button clear
-      $(".sample-request-clear").off("click");
-      $(".sample-request-clear").on("click", function(e) {
-          e.preventDefault();
-          var $root = $(this).parents("article");
-          var group = $root.data("group");
-          var name = $root.data("name");
-          var version = $root.data("version");
-          clearSampleRequest(group, name, version);
-      });
-  }; // initDynamic
+        // Button clear
+        $(".sample-request-clear").off("click");
+        $(".sample-request-clear").on("click", function(e) {
+            e.preventDefault();
+            var $root = $(this).parents("article");
+            var group = $root.data("group");
+            var name = $root.data("name");
+            var version = $root.data("version");
+            clearSampleRequest(group, name, version);
+        });
+
+
+        $('.switch-url-base').on('click', () => {
+            $('.switch-url-base').each(function () {
+                const urlType = $(this).attr('data-url-type');
+                const stagingUrl = apiProject['url:staging'] + $(this).attr('data-url-ext');
+                const prodUrl = apiProject['url:prod'] + $(this).attr('data-url-ext');
+                console.log($(this))
+    
+                $(this).attr('data-url-type', urlType === 'prod' ? 'staging' : 'prod');
+                $(this).text(`Switch to ${urlType}`)
+                $(this).siblings().children('.request-url').text(urlType === 'prod' ? stagingUrl : prodUrl);
+            })
+        });
+    }; // initDynamic
 
   function sendSampleRequest(group, name, version, type)
   {

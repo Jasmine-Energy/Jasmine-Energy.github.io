@@ -54,6 +54,7 @@ function ($, _, locale, Handlebars, apiProject, apiData, sampleRequest, semver, 
   // load google web fonts
   loadGoogleFontCss();
 
+  apiProject.url = apiProject['url:staging'];
   var api = apiData.api;
 
   api.forEach(function (entry) {
@@ -321,8 +322,10 @@ function ($, _, locale, Handlebars, apiProject, apiData, sampleRequest, semver, 
         }
 
         // add prefix URL for endpoint
-        if (apiProject.url)
-          fields.article.url = apiProject.url + fields.article.url;
+        if (apiProject.url) {
+          fields.article.urlExt = fields.article.url;
+          fields.article.url = apiProject.url + fields.article.urlExt;
+        }
 
         addArticleSettings(fields, entry);
 

@@ -8,7 +8,7 @@
   <link href="vendor/bootstrap.min.css" rel="stylesheet" media="screen">
   <link href="vendor/prettify.css" rel="stylesheet" media="screen">
   <link href="css/style.css" rel="stylesheet" media="screen, print">
-  <link href="img/favicon.ico" rel="icon" type="image/x-icon">
+  <link rel="icon" type="image/x-icon" href="img/JasmineFav.png" />
   <script src="vendor/polyfill.js"></script>
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -158,7 +158,12 @@
           <p>{{{nl2br article.description}}}</p>
         {{/if}}
 
-        <pre class="full-pre pre-{{toLowerCase article.type}}" data-type="{{toLowerCase article.type}}"><span class="typ typ-{{toLowerCase article.type}}">{{toUpperCase article.type}}</span> <span class="url">{{article.url}}</span></pre>
+        <div class="flex flex-row items-center justify-between mb-4">
+          <pre class="full-pre pre-{{toLowerCase article.type}}" data-type="{{toLowerCase article.type}}"><span class="typ typ-{{toLowerCase article.type}}">{{toUpperCase article.type}}</span> <span class="url request-url">{{article.url}}</span></pre>
+          <button class="switch-url-base btn btn-primary btn-sm hide-print" data-url-type="staging" data-url-ext="{{article.urlExt}}">
+            Switch to Prod
+          </button>
+        </div>
 
         {{#if article.permission}}
           <p>

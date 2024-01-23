@@ -3,7 +3,8 @@ define({
   "version": "1.0.0",
   "description": "REST API consumer documentation.",
   "title": "Jasmine API ",
-  "url": "https://api.jazzmine.xyz/v1",
+  "url:staging": "https://api.jazzmine.xyz/v1",
+  "url:prod": "https://api.jasmine.energy/v1",
   "order": [
     "Bridge",
     "EnergyAttributeCertificate",
@@ -27,7 +28,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2024-01-23T18:22:01.369Z",
+    "time": "2024-01-23T19:37:53.979Z",
     "url": "https://apidocjs.com",
     "version": "0.29.0"
   }
