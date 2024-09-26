@@ -57,96 +57,6 @@ define({ "api": [
     }
   },
   {
-    "type": "post",
-    "url": "/bridge/bridge-off-request",
-    "title": "Make a bridge off request",
-    "description": "<p>Make a request to bridge off a certificate</p>",
-    "version": "1.0.0",
-    "name": "BridgeOffRequest",
-    "group": "Bridge",
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "certificateId",
-        "description": "<p>UUID String of the certificate</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "allowedValues": [
-          "\"0x...\""
-        ],
-        "optional": false,
-        "field": "walletAddress",
-        "description": "<p>Wallet's address</p>"
-      }
-    ],
-    "success": {
-      "fields": {
-        "200 OK": [
-          {
-            "group": "200 OK",
-            "optional": false,
-            "field": "/",
-            "description": "<p>{ }</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{ \"state\": \"fulfilled\" }",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "src/api/core/routes/v1/bridge.route.ts",
-    "groupTitle": "Bridge",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "allowedValues": [
-              "\"application/json\""
-            ],
-            "optional": false,
-            "field": "Content-Type",
-            "defaultValue": "application/json",
-            "description": "<p>Mime-type of the request</p>"
-          },
-          {
-            "group": "Header",
-            "type": "String",
-            "allowedValues": [
-              "\"pk_...\""
-            ],
-            "optional": false,
-            "field": "X-API-KEY",
-            "description": "<p>Organization's API key</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "500",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
-          "type": "json"
-        },
-        {
-          "title": "404",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
     "type": "get",
     "url": "/bridge/recent",
     "title": "Get recent bridge transactions",
@@ -1822,7 +1732,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/retirement/:energyCertificateRetirementId",
+    "url": "/:chainId/retirement/id/:energyCertificateRetirementId",
     "title": "Get an energy certificate retirement record",
     "description": "<p>Get an energy certificate retirement.</p>",
     "version": "1.0.0",
@@ -1985,7 +1895,82 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/retirement/transactions",
+    "url": "/:chainId/retirement/:transactionHash",
+    "title": "Get retirement record by transaction hash",
+    "description": "<p>Get records of energy certificate retirement.</p>",
+    "version": "1.0.0",
+    "name": "GetRetirementByTransactionHash",
+    "group": "EnergyCertificateRetirement",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "RetirementTransaction",
+            "optional": false,
+            "field": "retirement",
+            "description": "<p>Energy certificate retirement</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/retirement.route.ts",
+    "groupTitle": "EnergyCertificateRetirement"
+  },
+  {
+    "type": "get",
+    "url": "/:chainId/retirement/transactions",
     "title": "List recent retirements grouped by transaction",
     "description": "<p>List recent retirements grouped by transaction</p>",
     "version": "1.0.0",
@@ -2134,7 +2119,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/retirement/transactions",
+    "url": "/:chainId/retirement/transactions",
     "title": "List recent retirements",
     "description": "<p>List recent retirements</p>",
     "version": "1.0.0",
@@ -2279,11 +2264,144 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/retirement/download-pdfs",
+    "url": "/:chainId/retirement/download-pdfs",
     "title": "Download attestation PDFs for retirements",
+    "description": "<p>Returns a signed url for a zip or a batched pdf for available transactions</p>",
+    "version": "1.0.0",
+    "name": "RetirementDownloadAttestationPDFs",
+    "group": "EnergyCertificateRetirement",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String[]",
+        "optional": false,
+        "field": "transactionHashes",
+        "description": "<p>Retirement transaction hashes</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>AWS PDF/Zip signed file url</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/retirement.route.ts",
+    "groupTitle": "EnergyCertificateRetirement",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/:chainId/retirement/summary",
+    "title": "",
+    "description": "<p>Return retirement metadata</p>",
+    "version": "1.0.0",
+    "name": "RetirementMetadata",
+    "group": "EnergyCertificateRetirement",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Metadata",
+            "optional": false,
+            "field": "media",
+            "description": "<p>Media instances</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>Route does not exist</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/retirement.route.ts",
+    "groupTitle": "EnergyCertificateRetirement"
+  },
+  {
+    "type": "get",
+    "url": "/:chainId/retirement/summary",
+    "title": "",
+    "description": "<p>Return retirement metadata</p>",
+    "version": "1.0.0",
+    "name": "RetirementMetadata",
+    "group": "EnergyCertificateRetirement",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Metadata",
+            "optional": false,
+            "field": "media",
+            "description": "<p>Media instances</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>Route does not exist</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/retirement.route.ts",
+    "groupTitle": "EnergyCertificateRetirement"
+  },
+  {
+    "type": "post",
+    "url": "/:chainId/retirement/view-pdfs",
+    "title": "View attestation PDFs for retirements",
     "description": "<p>Returns attestation PDFs for retirements (if available)</p>",
     "version": "1.0.0",
-    "name": "RetirementAttestationPDFs",
+    "name": "RetirementViewAttestationPDFs",
     "group": "EnergyCertificateRetirement",
     "body": [
       {
@@ -2390,94 +2508,8 @@ define({ "api": [
     }
   },
   {
-    "type": "get",
-    "url": "/retirement/summary",
-    "title": "",
-    "description": "<p>Return retirement metadata</p>",
-    "version": "1.0.0",
-    "name": "RetirementMetadata",
-    "group": "EnergyCertificateRetirement",
-    "success": {
-      "fields": {
-        "200 OK": [
-          {
-            "group": "200 OK",
-            "type": "Metadata",
-            "optional": false,
-            "field": "media",
-            "description": "<p>Media instances</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "404 Not Found": [
-          {
-            "group": "404 Not Found",
-            "optional": false,
-            "field": "NotFound",
-            "description": "<p>Route does not exist</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "404",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "src/api/core/routes/v1/retirement.route.ts",
-    "groupTitle": "EnergyCertificateRetirement"
-  },
-  {
-    "type": "get",
-    "url": "/retirement/summary",
-    "title": "",
-    "description": "<p>Return retirement metadata</p>",
-    "version": "1.0.0",
-    "name": "RetirementMetadata",
-    "group": "EnergyCertificateRetirement",
-    "success": {
-      "fields": {
-        "200 OK": [
-          {
-            "group": "200 OK",
-            "type": "Metadata",
-            "optional": false,
-            "field": "media",
-            "description": "<p>Media instances</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "404 Not Found": [
-          {
-            "group": "404 Not Found",
-            "optional": false,
-            "field": "NotFound",
-            "description": "<p>Route does not exist</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "404",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "src/api/core/routes/v1/retirement.route.ts",
-    "groupTitle": "EnergyCertificateRetirement"
-  },
-  {
     "type": "post",
-    "url": "/retirement/",
+    "url": "/:chainId/retirement/",
     "title": "Submit retirement information for a retired energy attribute certificate",
     "description": "<p>Submit retirement information</p>",
     "version": "1.0.0",
@@ -2690,70 +2722,67 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/estimates/rec-revenue",
-    "title": "Obtain EAC revenue based on generator info",
-    "description": "<p>Obtain EAC revenue based on generator info.</p>",
+    "url": "/generator/",
+    "title": "Create a new generator application",
+    "description": "<p>Create new generator application</p>",
     "version": "1.0.0",
-    "name": "RecRevenueEstimate",
-    "group": "Estimates",
+    "name": "CreateEnergyGenerator",
+    "group": "EnergyGenerator",
     "permission": [
       {
-        "name": "public"
+        "name": "developer"
       }
     ],
     "body": [
       {
         "group": "Body",
         "type": "String",
-        "size": "2",
         "optional": false,
-        "field": "state",
-        "description": "<p>State code</p>"
+        "field": "name",
+        "description": "<p>Name of the electrical generation facility or unit</p>"
       },
       {
         "group": "Body",
-        "type": "Number",
+        "type": "String",
         "optional": false,
-        "field": "annual_production",
-        "description": "<p>Annual energy production (in kWh)</p>"
+        "field": "organizationId",
+        "description": "<p>Organization id</p>"
       },
       {
         "group": "Body",
-        "type": "Number",
+        "type": "String",
+        "allowedValues": [
+          "\"0x...\""
+        ],
         "optional": false,
-        "field": "term_years",
-        "description": "<p>Number of years the generator will be in use</p>"
+        "field": "walletAddress",
+        "description": "<p>Wallet's address</p>"
       }
     ],
-    "parameter": {
-      "examples": [
-        {
-          "title": "Payload example",
-          "content": "{\n   \"state\": \"NV\",\n   \"annual_production\": 9150,\n   \"term_years\": 25\n}",
-          "type": "json"
-        }
-      ]
-    },
     "error": {
       "fields": {
         "400 Bad Request": [
           {
             "group": "400 Bad Request",
             "optional": false,
-            "field": "InvalidState",
-            "description": "<p>State code is required as alphanumeric string of 2 characters max.</p>"
-          },
+            "field": "ValidationError",
+            "description": "<p>Some parameters may contain invalid values</p>"
+          }
+        ],
+        "401 Unauthorized": [
           {
-            "group": "400 Bad Request",
+            "group": "401 Unauthorized",
             "optional": false,
-            "field": "InvalidAnnualProduction",
-            "description": "<p>Annual production is required as number.</p>"
-          },
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can create the data</p>"
+          }
+        ],
+        "403 Forbidden": [
           {
-            "group": "400 Bad Request",
+            "group": "403 Forbidden",
             "optional": false,
-            "field": "InvalidTerms",
-            "description": "<p>Terms is required as number.</p>"
+            "field": "Forbidden",
+            "description": "<p>Only admins can create the data</p>"
           }
         ],
         "406 Not Acceptable": [
@@ -2769,6 +2798,14 @@ define({ "api": [
             "field": "Origin",
             "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
           }
+        ],
+        "409 Conflict": [
+          {
+            "group": "409 Conflict",
+            "optional": false,
+            "field": "MySQLError",
+            "description": "<p>Some parameters are already presents in database (username or email)</p>"
+          }
         ]
       },
       "examples": [
@@ -2778,14 +2815,29 @@ define({ "api": [
           "type": "json"
         },
         {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
           "title": "406",
           "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "409",
+          "content": "HTTP/1.1 409 Conflict\n{\n  \"statusCode\": 409,\n  \"statusText\": \"Conflict\",\n  \"errors\": [\n    \"Duplicate entry for key IDX.542115fs84521fsd\"\n  ]\n}",
           "type": "json"
         }
       ]
     },
-    "filename": "src/api/core/routes/v1/estimates.route.ts",
-    "groupTitle": "Estimates",
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
     "header": {
       "fields": {
         "Header": [
@@ -2797,17 +2849,947 @@ define({ "api": [
             ],
             "optional": false,
             "field": "Content-Type",
+            "defaultValue": "application/json",
             "description": "<p>Mime-type of the request</p>"
           },
           {
             "group": "Header",
             "type": "String",
             "allowedValues": [
-              "\"https://*\""
+              "\"pk_...\""
             ],
             "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/generator",
+    "title": "Get all generators for organization",
+    "description": "<p>Get all generators for organization</p>",
+    "version": "1.0.0",
+    "name": "GetEnergyGenerator",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
             "field": "Origin",
-            "description": "<p>Origin URL</p>"
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/generator/:generatorId",
+    "title": "Get an energy generator record",
+    "description": "<p>Get an energy generator record</p>",
+    "version": "1.0.0",
+    "name": "GetEnergyGenerator",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Energy certificate retirement id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/generator/:generatorId",
+    "title": "Get an energy generator record",
+    "description": "<p>Get an energy generator record</p>",
+    "version": "1.0.0",
+    "name": "GetEnergyGenerator",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Energy certificate retirement id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "put",
+    "url": "/generator/:generatorId",
+    "title": "Upload documents to in-progress Energy Generator application",
+    "description": "<p>Append document to EnergyGenerator</p>",
+    "version": "1.0.0",
+    "name": "PostEnergyGeneratorDocuments",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "developer"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Energy certificate retirement id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "put",
+    "url": "/generator/:generatorId",
+    "title": "Append detail to an in-progress Energy Generator application",
+    "description": "<p>Append details to EnergyGenerator</p>",
+    "version": "1.0.0",
+    "name": "PutEnergyGenerator",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "developer"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Energy certificate retirement id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "put",
+    "url": "/generator/:generatorId",
+    "title": "Submit a pending generator application for review",
+    "description": "<p>Submit EnergyGenerator for review</p>",
+    "version": "1.0.0",
+    "name": "SubmitEnergyGenerator",
+    "group": "EnergyGenerator",
+    "permission": [
+      {
+        "name": "developer"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Energy certificate retirement id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"0x...\""
+            ],
+            "optional": false,
+            "field": "walletAddress",
+            "description": "<p>Wallet's address</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "EnergyGenerator",
+            "optional": false,
+            "field": "EnergyGenerator",
+            "description": "<p>object</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "401 Unauthorized": [
+          {
+            "group": "401 Unauthorized",
+            "optional": false,
+            "field": "Unauthorized",
+            "description": "<p>Only authenticated users can access the data</p>"
+          }
+        ],
+        "403 Forbidden": [
+          {
+            "group": "403 Forbidden",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>Only user with same id or admins can access the data</p>"
+          }
+        ],
+        "404 Not Found": [
+          {
+            "group": "404 Not Found",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>User does not exist</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ],
+        "417 Expectation Failed": [
+          {
+            "group": "417 Expectation Failed",
+            "optional": false,
+            "field": "ExpectationFailed",
+            "description": "<p>The id parameters failed to match</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "401",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"statusCode\": 401,\n  \"statusText\": \"Unauthorized\",\n  \"errors\": [\n    \"Password must match to authorize a token generating\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "403",
+          "content": "HTTP/1.1 403 Forbidden\n{\n  \"statusCode\": 403,\n  \"statusText\": \"Forbidden\",\n  \"errors\": [\n    \"Only user with same id or admin can access to resource\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "417",
+          "content": "HTTP/1.1 417 ExpectationFailed\n{\n  \"statusCode\": 417,\n  \"statusText\": \"Expectation failed\",\n  \"errors\": [\n    \"id must be a number\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/generator.route.ts",
+    "groupTitle": "EnergyGenerator",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
           }
         ]
       }
@@ -3028,6 +4010,497 @@ define({ "api": [
     }
   },
   {
+    "type": "post",
+    "url": "/estimates/solar-rec-revenue",
+    "title": "Estimate",
+    "description": "<p>Estimate annual REC revenue from a residential solar installation</p>",
+    "version": "1.0.0",
+    "name": "SolarRecRevenueEstimate",
+    "group": "Estimates",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "address",
+        "description": "<p>Street address of generator</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "annualProduction",
+        "description": "<p>Estimated annual energy production in kWh (optional)</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "tilt",
+        "description": "<p>Angle of solar panel tilt on roof (optional)</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "azimuth",
+        "description": "<p>Orientation angle of solar panel (optional)</p>"
+      }
+    ],
+    "parameter": {
+      "examples": [
+        {
+          "title": "Payload example",
+          "content": "{\n   \"address\": \"1600 Pennsylvania Ave Washington DC\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Payload example",
+          "content": "{\n   \"location\": { \"lat\": \"\", lng: \"\" },\n   \"annualProduction\": 9150\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "400 Bad Request": [
+          {
+            "group": "400 Bad Request",
+            "optional": false,
+            "field": "InvalidAnnualProduction",
+            "description": "<p>Annual production is required as number.</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "400",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"statusCode\": 400,\n  \"statusText\": \"Bad request\",\n  \"errors\": [\n    {\n      \"field\": \"email\",\n      \"types\": [\n        \"string.email\"\n      ],\n      \"messages\": [\n        \"\\\"email\\\" must be a valid email address\"\n      ]\n    }\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/estimates.route.ts",
+    "groupTitle": "Estimates",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"https://*\""
+            ],
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin URL</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "post",
+    "url": "/estimates/uniswap/lp",
+    "title": "Obtain USD value a UniSwap LP position given the LP ID",
+    "description": "<p>Obtain USD value a UniSwap LP position given the LP ID</p>",
+    "version": "1.0.0",
+    "name": "UniSwapLPValueEstimateById",
+    "group": "Estimates",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": true,
+        "field": "lpId",
+        "description": "<p>ID of the UniSwap LP position</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "allowedValues": [
+          "\"0x...\""
+        ],
+        "optional": false,
+        "field": "walletAddress",
+        "description": "<p>Wallet's address</p>"
+      }
+    ],
+    "parameter": {
+      "examples": [
+        {
+          "title": "Payload example",
+          "content": "{\n   \"lpId\": 8912412481\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "400 Bad Request": [
+          {
+            "group": "400 Bad Request",
+            "optional": false,
+            "field": "InvalidAmount",
+            "description": "<p>quantity is required as a number.</p>"
+          }
+        ],
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Content-Type",
+            "description": "<p>Content-Type header must be &quot;application/json&quot;.</p>"
+          },
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "Origin",
+            "description": "<p>Origin header must be &quot;https://*&quot;.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "400",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"statusCode\": 400,\n  \"statusText\": \"Bad request\",\n  \"errors\": [\n    {\n      \"field\": \"email\",\n      \"types\": [\n        \"string.email\"\n      ],\n      \"messages\": [\n        \"\\\"email\\\" must be a valid email address\"\n      ]\n    }\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/estimates.route.ts",
+    "groupTitle": "Estimates",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:symbol",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "BasisPool",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "BasisPool",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address/positions",
+    "title": "",
+    "description": "<p>Return all positions from a basis pool</p>",
+    "version": "1.0.0",
+    "name": "BasisPoolDeposits",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address/withdrawRequest",
+    "title": "",
+    "description": "<p>Return all withdrawRequest from a basis pool</p>",
+    "version": "1.0.0",
+    "name": "BasisPoolDeposits",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address/history",
+    "title": "",
+    "description": "<p>Return the recent transaction history for a basis pool</p>",
+    "version": "1.0.0",
+    "name": "BasisPoolHistory",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address/price",
+    "title": "",
+    "description": "<p>Return the price history for a specific basis pool</p>",
+    "version": "1.0.0",
+    "name": "BasisPoolPriceHistory",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
     "type": "get",
     "url": "/jlt/:poolAddress/data",
     "title": "Get Basis Pool Chart Data",
@@ -3146,6 +4619,49 @@ define({ "api": [
         }
       ]
     }
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:address/summary",
+    "title": "",
+    "description": "<p>Return summary of a deployed basis pool</p>",
+    "version": "1.0.0",
+    "name": "BasisPoolSummary",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
   },
   {
     "type": "get",
@@ -3785,6 +5301,135 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/fjlt/metadata/:symbol",
+    "title": "",
+    "description": "<p>Returns ERC-1046 compliant metadata. This route is returned by JLT smart contracts.</p>",
+    "version": "1.0.0",
+    "name": "GetTokenMetadata",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/metadata/:symbol",
+    "title": "",
+    "description": "<p>Returns ERC-1046 compliant metadata. This route is returned by JLT smart contracts.</p>",
+    "version": "1.0.0",
+    "name": "GetTokenMetadata",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/metadata/:symbol",
+    "title": "",
+    "description": "<p>Returns ERC-1046 compliant metadata. This route is returned by JLT smart contracts.</p>",
+    "version": "1.0.0",
+    "name": "GetTokenMetadata",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
     "url": "/jlt/metadata/:address",
     "title": "Get ERC-1046 compliant metadata by address",
     "description": "<p>Returns ERC-1046 compliant metadata. This route is returned by JLT smart contracts.</p>",
@@ -3874,6 +5519,113 @@ define({ "api": [
       }
     },
     "filename": "src/api/core/routes/v1/jlt.route.ts",
+    "groupTitle": "JasmineBasisToken",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/trade/token/metadata/:address",
+    "title": "Get ERC-1046 compliant metadata by address",
+    "description": "<p>Returns ERC-1046 compliant metadata. This route is returned by JLT smart contracts.</p>",
+    "version": "1.0.0",
+    "name": "GetTokenMetadataByAddress",
+    "group": "JasmineBasisToken",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "address",
+            "description": "<p>Address of the token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "interop",
+            "description": "<p>Interoperability information</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Boolean",
+            "optional": false,
+            "field": "interop.erc1046",
+            "description": "<p>Whether the token is ERC-1046 compliant</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Boolean",
+            "optional": false,
+            "field": "interop.erc721",
+            "description": "<p>Whether the token is ERC-721 compliant</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Boolean",
+            "optional": false,
+            "field": "interop.erc1155",
+            "description": "<p>Whether the token is ERC-1155 compliant</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Number",
+            "optional": false,
+            "field": "decimals",
+            "description": "<p>Number of decimals</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "image",
+            "description": "<p>URI of the token image</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "String[]",
+            "optional": false,
+            "field": "images",
+            "description": "<p>List of URIs of the token images</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "String[]",
+            "optional": false,
+            "field": "icons",
+            "description": "<p>List of URIs of the token icons</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "summary",
+            "description": "<p>Summary of the token</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/trade.route.ts",
     "groupTitle": "JasmineBasisToken",
     "error": {
       "examples": [
@@ -3982,6 +5734,638 @@ define({ "api": [
     },
     "filename": "src/api/core/routes/v1/jlt.route.ts",
     "groupTitle": "JasmineBasisToken",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/getTokenPairPrice",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "GetTokenPairPrice",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt/:walletAddress/balance",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "JLTUserBalance",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/fjlt",
+    "title": "",
+    "description": "<p>Return jasmine basis pool token</p>",
+    "version": "1.0.0",
+    "name": "TokenizationStatistics",
+    "group": "JasmineBasisToken",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "response",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "500 Server Error": [
+          {
+            "group": "500 Server Error",
+            "optional": false,
+            "field": "internal",
+            "description": "<p>error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/fjlt.route.ts",
+    "groupTitle": "JasmineBasisToken"
+  },
+  {
+    "type": "get",
+    "url": "/",
+    "title": "Ping API root",
+    "version": "1.0.0",
+    "name": "Status",
+    "group": "Main",
+    "permission": [
+      {
+        "name": "public"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "/",
+            "description": "<p>Success message as &quot;OK&quot;.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success",
+          "content": "HTTP/1.1 200\nOK",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "406 Not Acceptable": [
+          {
+            "group": "406 Not Acceptable",
+            "optional": false,
+            "field": "NotAcceptable",
+            "description": "<p>An expected header value was not passed correctly.</p>"
+          }
+        ],
+        "500 Internal Server Error": [
+          {
+            "group": "500 Internal Server Error",
+            "optional": false,
+            "field": "InternalServerError",
+            "description": "<p>An unexpected error was occurred.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "406",
+          "content": "HTTP/1.1 406 Not Acceptable\n{\n  \"statusCode\": 406,\n  \"statusText\": \"Not acceptable\",\n  \"errors\": [\n    \"Content-Type should be application/json or multipart/form-data, text/html given\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "src/api/core/routes/v1/main.route.ts",
+    "groupTitle": "Main"
+  },
+  {
+    "type": "post",
+    "url": "/organization/kyc",
+    "title": "Submit KYC request",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "SubmitOrganizationKycRequest",
+    "group": "Organization",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "userid",
+            "description": "<p>Organization ID</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "name",
+        "description": "<p>User name</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>User email</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "businessName",
+        "description": "<p>User business name</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "address",
+        "description": "<p>User address</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": true,
+        "field": "address2",
+        "description": "<p>User address 2</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "city",
+        "description": "<p>User city</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "state",
+        "description": "<p>User state</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "zip",
+        "description": "<p>User zip</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": true,
+        "field": "registries",
+        "description": "<p>User registries</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": true,
+        "field": "registriesInfo",
+        "description": "<p>User registries info</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "allowedValues": [
+          "\"0x...\""
+        ],
+        "optional": false,
+        "field": "walletAddress",
+        "description": "<p>Wallet's address</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/organization",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "getAuthedOrganization",
+    "group": "Organization",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "optional": false,
+            "field": "/",
+            "description": "<p>{ }</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/organization",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "getAuthedOrganization",
+    "group": "Organization",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "optional": false,
+            "field": "/",
+            "description": "<p>{ }</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/organization",
+    "title": "",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "getAuthedOrganization",
+    "group": "Organization",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "optional": false,
+            "field": "/",
+            "description": "<p>{ }</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/portfolio/lp-positions/:walletAddress",
+    "title": "Get UniSwap (V3) LP positions",
+    "description": "<p>Return User's UniSwap LP Positions</p>",
+    "version": "1.0.0",
+    "name": "GetLPPositionsForAddress",
+    "group": "Portfolio",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "positions",
+            "description": "<p>as position ID keys and position details as values</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/portfolio.route.ts",
+    "groupTitle": "Portfolio",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/portfolio/retirement/download-pdfs",
+    "title": "Download attestation PDFs for retirements",
+    "description": "<p>Returns attestation PDFs for retirements (if available)</p>",
+    "version": "1.0.0",
+    "name": "GetRetirementAttestations",
+    "group": "Portfolio",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String[]",
+        "optional": false,
+        "field": "transactionHashes",
+        "description": "<p>Retirement transaction hashes</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "RetirementAttestationPDF[]",
+            "optional": false,
+            "field": ".",
+            "description": "<p>AWS PDF file instances</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": ".url",
+            "description": "<p>AWS PDF file url</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "EnergyCertificateRetirement[]",
+            "optional": false,
+            "field": ".retirementTransactions",
+            "description": "<p>Retirement transactions</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Number",
+            "optional": false,
+            "field": ".size",
+            "description": "<p>AWS PDF file size</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": ".contentType",
+            "description": "<p>AWS PDF file content type</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/portfolio.route.ts",
+    "groupTitle": "Portfolio",
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/portfolio/eats-summary/:walletAddress",
+    "title": "Get EAT statistics (techs & vintages)",
+    "description": "<p>Return User Token Stats</p>",
+    "version": "1.0.0",
+    "name": "GetUserTokenStats",
+    "group": "Portfolio",
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "Number",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of EATs tokenized</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Object[]",
+            "optional": false,
+            "field": "techBlends",
+            "description": "<p>List of tech blends</p>"
+          },
+          {
+            "group": "200 OK",
+            "type": "Object",
+            "optional": false,
+            "field": "vintages",
+            "description": "<p>Dictionary of vintages and their counts</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/portfolio.route.ts",
+    "groupTitle": "Portfolio",
     "error": {
       "examples": [
         {
@@ -4235,150 +6619,51 @@ define({ "api": [
     }
   },
   {
-    "type": "post",
-    "url": "/user/kyc",
-    "title": "Submit KYC request",
-    "description": "<p>Return</p>",
+    "type": "get",
+    "url": "/liquidity",
+    "title": "Get liquidity for a given token pair at each fee tier",
+    "description": "<p>Get liquidity for a given token pair</p>",
     "version": "1.0.0",
-    "name": "SubmitUserKycRequest",
-    "group": "User",
+    "name": "GetTokenPairLiquidity",
+    "group": "Trade",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
             "type": "String",
-            "optional": false,
-            "field": "userid",
-            "description": "<p>User ID</p>"
+            "optional": true,
+            "field": "chainId",
+            "description": "<p>Chain ID</p>"
           }
         ]
       }
     },
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "name",
-        "description": "<p>User name</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "email",
-        "description": "<p>User email</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "businessName",
-        "description": "<p>User business name</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "address",
-        "description": "<p>User address</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": true,
-        "field": "address2",
-        "description": "<p>User address 2</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "city",
-        "description": "<p>User city</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "state",
-        "description": "<p>User state</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "zip",
-        "description": "<p>User zip</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": true,
-        "field": "registries",
-        "description": "<p>User registries</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": true,
-        "field": "registriesInfo",
-        "description": "<p>User registries info</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "allowedValues": [
-          "\"0x...\""
-        ],
-        "optional": false,
-        "field": "walletAddress",
-        "description": "<p>Wallet's address</p>"
-      }
-    ],
+    "filename": "src/api/core/routes/v1/trade.route.ts",
+    "groupTitle": "Trade"
+  },
+  {
+    "type": "get",
+    "url": "/wallet",
+    "title": "Get wallet information & organization",
+    "description": "<p>Return wallet and any associated organization</p>",
+    "version": "1.0.0",
+    "name": "GetWallet",
+    "group": "Wallet",
     "success": {
       "fields": {
         "200 OK": [
           {
             "group": "200 OK",
-            "type": "String",
             "optional": false,
-            "field": "message",
-            "description": "<p>Message</p>"
+            "field": "/",
+            "description": "<p>{ }</p>"
           }
         ]
       }
     },
-    "filename": "src/api/core/routes/v1/user.route.ts",
-    "groupTitle": "User",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "allowedValues": [
-              "\"application/json\""
-            ],
-            "optional": false,
-            "field": "Content-Type",
-            "defaultValue": "application/json",
-            "description": "<p>Mime-type of the request</p>"
-          },
-          {
-            "group": "Header",
-            "type": "String",
-            "allowedValues": [
-              "\"pk_...\""
-            ],
-            "optional": false,
-            "field": "X-API-KEY",
-            "description": "<p>Organization's API key</p>"
-          }
-        ]
-      }
-    },
+    "filename": "src/api/core/routes/v1/wallet.route.ts",
+    "groupTitle": "Wallet",
     "error": {
       "examples": [
         {
@@ -4396,12 +6681,12 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/user/registry-access",
-    "title": "Get user registry access list",
+    "url": "/walletuser/registry-access",
+    "title": "Get wallet registry access list",
     "description": "<p>Return user registry access list</p>",
     "version": "1.0.0",
-    "name": "UserRegistryAccess",
-    "group": "User",
+    "name": "GetWalletRegistryAccess",
+    "group": "Wallet",
     "success": {
       "fields": {
         "200 OK": [
@@ -4414,45 +6699,8 @@ define({ "api": [
         ]
       }
     },
-    "filename": "src/api/core/routes/v1/user.route.ts",
-    "groupTitle": "User",
-    "error": {
-      "examples": [
-        {
-          "title": "500",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
-          "type": "json"
-        },
-        {
-          "title": "404",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
-    "type": "get",
-    "url": "/user",
-    "title": "",
-    "description": "<p>Return</p>",
-    "version": "1.0.0",
-    "name": "getUserByAuthToken",
-    "group": "User",
-    "success": {
-      "fields": {
-        "200 OK": [
-          {
-            "group": "200 OK",
-            "optional": false,
-            "field": "/",
-            "description": "<p>{ }</p>"
-          }
-        ]
-      }
-    },
-    "filename": "src/api/core/routes/v1/user.route.ts",
-    "groupTitle": "User",
+    "filename": "src/api/core/routes/v1/wallet.route.ts",
+    "groupTitle": "Wallet",
     "error": {
       "examples": [
         {
