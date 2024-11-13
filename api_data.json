@@ -5947,6 +5947,200 @@
   },
   {
     "type": "post",
+    "url": "/organization/:organizationId/add-wallet",
+    "title": "Add wallet to organization",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "AddWalletToOrganization",
+    "group": "Organization",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "organizationId",
+            "description": "<p>Organization ID</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "walletAddresses",
+        "description": "<p>List of wallet addresses</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "role",
+        "description": "<p>Authorized role within organization (optional)</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "allowedValues": [
+          "\"0x...\""
+        ],
+        "optional": false,
+        "field": "walletAddress",
+        "description": "<p>Wallet's address</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/organization/:organizationId/wallets",
+    "title": "Get list of wallet addresses within an organization",
+    "description": "<p>Return</p>",
+    "version": "1.0.0",
+    "name": "GetWalletsInOrganization",
+    "group": "Organization",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "organizationId",
+            "description": "<p>Organization ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 OK": [
+          {
+            "group": "200 OK",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/api/core/routes/v1/organization.route.ts",
+    "groupTitle": "Organization",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"application/json\""
+            ],
+            "optional": false,
+            "field": "Content-Type",
+            "defaultValue": "application/json",
+            "description": "<p>Mime-type of the request</p>"
+          },
+          {
+            "group": "Header",
+            "type": "String",
+            "allowedValues": [
+              "\"pk_...\""
+            ],
+            "optional": false,
+            "field": "X-API-KEY",
+            "description": "<p>Organization's API key</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "allowedValues": [
+          "\"0x...\""
+        ],
+        "optional": false,
+        "field": "walletAddress",
+        "description": "<p>Wallet's address</p>"
+      }
+    ],
+    "error": {
+      "examples": [
+        {
+          "title": "500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
+          "type": "json"
+        },
+        {
+          "title": "404",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
     "url": "/organization/kyc",
     "title": "Submit KYC request",
     "description": "<p>Return</p>",
@@ -6108,44 +6302,7 @@
   {
     "type": "get",
     "url": "/organization",
-    "title": "",
-    "description": "<p>Return</p>",
-    "version": "1.0.0",
-    "name": "getAuthedOrganization",
-    "group": "Organization",
-    "success": {
-      "fields": {
-        "200 OK": [
-          {
-            "group": "200 OK",
-            "optional": false,
-            "field": "/",
-            "description": "<p>{ }</p>"
-          }
-        ]
-      }
-    },
-    "filename": "src/api/core/routes/v1/organization.route.ts",
-    "groupTitle": "Organization",
-    "error": {
-      "examples": [
-        {
-          "title": "500",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n  \"statusCode\": 500,\n  \"statusText\": \"Server error\",\n  \"errors\": [\n    \"Oops, an unexpected error was occurred\"\n  ]\n}",
-          "type": "json"
-        },
-        {
-          "title": "404",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"statusCode\": 404,\n  \"statusText\": \"Not found\",\n  \"errors\": [\n    \"The requested resource cannot be found\"\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
-    "type": "get",
-    "url": "/organization",
-    "title": "",
+    "title": "Get an organization",
     "description": "<p>Return</p>",
     "version": "1.0.0",
     "name": "getAuthedOrganization",
